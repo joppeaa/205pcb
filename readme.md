@@ -1,4 +1,4 @@
-Adding additional features to the Peugeot 205
+Adding additional features to the legendary Peugeot 205
 ![Board render](Assets/205PCB.png)
 
 WIP features:
