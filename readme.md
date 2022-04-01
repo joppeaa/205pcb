@@ -1,5 +1,5 @@
 Adding additional features to the Peugeot 205
-![Board render](assets/205PCB.png)
+![Board render](Assets/205PCB.png)
 
 WIP features:
 
