@@ -20,4 +20,5 @@ WIP features:
 	Temperature input
 	RPM input
 	auxilary input
-	Heaterbutton input
+	Heaterbutton input!
+	[image](https://user-images.githubusercontent.com/74567828/161341500-ac4609bd-3a9f-4806-8ce9-d7444797f503.png)
