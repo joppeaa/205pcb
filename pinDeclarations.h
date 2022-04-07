@@ -6,6 +6,21 @@
 #define headlightPin 6
 #define heaterPin 9
 #define servovoltagePin 25
+#define lockPin 34
+#define unlockPin 35
+#define defrostPin 36
+
+#define keyinputPin 24
+#define batteryinputPin 23
+#define auxinputPin 29
+#define tempinputPin 24
+#define rpminputPin 7
+
+#define keyonoutputPin 27
+#define engineonoutputPin 26
+
+#define servo1Pin 2
+#define servo2Pin 3
 
 #define 433A 14                       //433 Module inputs
 #define 433B 15
