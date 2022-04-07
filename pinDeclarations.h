@@ -22,7 +22,7 @@
 #define servo1Pin 2
 #define servo2Pin 3
 
-#define 433A 14                       //433 Module inputs
-#define 433B 15
-#define 433C 16
-#define 433D 17
+#define remotePinA 14                       //433 Module inputs
+#define remotePinB 15
+#define remotePinC 16
+#define remotePinD 17

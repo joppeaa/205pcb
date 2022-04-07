@@ -1,1 +1,76 @@
 #include "pinDeclarations.h"
+
+elapsedMillis maindelay;
+const unsigned int maindelayMax = 50;
+bool checkinputsFlag = 0;
+
+
+const int SHORT_PRESS_TIME = 1000; // 1000 milliseconds
+const int LONG_PRESS_TIME  = 1000; // 1000 milliseconds
+
+int currentState433A;
+int lastState433A = LOW;
+unsigned long pressedTime433A  = 0;
+unsigned long releasedTime433A = 0;
+bool isPressing433A = false;
+bool isLongDetected433A = false;
+
+
+void setup() {
+  // put your setup code here, to run once:
+  Serial.begin(9600);
+  delay(200);
+  
+  pinMode(remotePinA, INPUT_PULLDOWN);            //433 MHz module inputs
+  pinMode(remotePinB, INPUT_PULLDOWN);
+  pinMode(remotePinC, INPUT_PULLDOWN);
+  pinMode(remotePinD, INPUT_PULLDOWN);
+//  attachInterrupt(digitalPinToInterrupt(433A), 433interrupt, HIGH);
+//  attachInterrupt(digitalPinToInterrupt(433B), 433interrupt, HIGH);
+//  attachInterrupt(digitalPinToInterrupt(433C), 433interrupt, HIGH);
+//  attachInterrupt(digitalPinToInterrupt(433D), 433interrupt, HIGH);
+  
+}
+
+void loop() {
+  // put your main code here, to run repeatedly:
+
+if (maindelay > maindelayMax)               //Main high speed loop 
+{
+  maindelay = 0;                            //resetting maindelay timer
+  checkremoteInputs();
+}
+  
+}
+
+void checkremoteInputs()
+{
+  currentState433A = digitalRead(remotePinA);
+  if(lastState433A == LOW && currentState433A == HIGH)         // button is pressed
+  {
+    pressedTime433A = millis();
+    isPressing433A = true;
+    isLongDetected433A = false;
+  }
+  else if(lastState433A == HIGH && currentState433A == LOW)     // button is released
+  { 
+    isPressing433A = false;
+    releasedTime433A = millis();
+    long pressDuration433A = releasedTime433A - pressedTime433A;
+    if(pressDuration433A < SHORT_PRESS_TIME)
+    {
+      Serial.println("A short press is detected");
+    }
+  }
+  if(isPressing433A == true && isLongDetected433A == false)
+  {
+    long pressDuration433A = millis() - pressedTime433A;
+    if( pressDuration433A > LONG_PRESS_TIME ) 
+    {
+      Serial.println("A long press is detected");
+      isLongDetected433A = true;
+    }
+  }
+
+  lastState433A = currentState433A;
+}
