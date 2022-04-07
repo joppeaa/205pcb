@@ -84,9 +84,10 @@ void flashLED(int timestoflash)
 {
   for (int i = 0; i < timestoflash; i++)
   {
-    digitalToggle(13);
-    delay(50);
+    digitalWrite(13, HIGH);
+    delay(30);
+    digitalWrite(13, LOW);
+    delay(30);
   }
-  digitalWrite(13,HIGH);
-  
+    
 }
