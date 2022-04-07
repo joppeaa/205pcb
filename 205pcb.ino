@@ -20,6 +20,9 @@ void setup() {
   // put your setup code here, to run once:
   Serial.begin(9600);
   delay(200);
+  pinMode(13, OUTPUT);
+  flashLED(10);
+
   
   pinMode(remotePinA, INPUT_PULLDOWN);            //433 MHz module inputs
   pinMode(remotePinB, INPUT_PULLDOWN);
@@ -60,6 +63,7 @@ void checkremoteInputs()
     if(pressDuration433A < SHORT_PRESS_TIME)
     {
       Serial.println("A short press is detected");
+      flashLED(3);
     }
   }
   if(isPressing433A == true && isLongDetected433A == false)
@@ -69,8 +73,20 @@ void checkremoteInputs()
     {
       Serial.println("A long press is detected");
       isLongDetected433A = true;
+      flashLED(10);
     }
   }
 
   lastState433A = currentState433A;
+}
+
+void flashLED(int timestoflash)
+{
+  for (int i = 0; i < timestoflash; i++)
+  {
+    digitalToggle(13);
+    delay(50);
+  }
+  digitalWrite(13,HIGH);
+  
 }
