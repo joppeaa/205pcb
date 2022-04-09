@@ -2,29 +2,22 @@
 
 elapsedMillis maindelay;
 const unsigned int maindelayMax = 50;
-bool checkinputsFlag = 0;
 
+const int LONG_PRESS_MIN  = 1500; // 1000 milliseconds
 
-const int SHORT_PRESS_TIME = 1500; // 1000 milliseconds
-const int LONG_PRESS_TIME  = 1500; // 1000 milliseconds
+struct remoteModule
+{
+  int currentState;
+  int lastState = LOW;
+  unsigned long pressedTime;
+  unsigned long releasedTime;
+  bool isPressing = false;
+  bool isLongDetected = false;
+  bool shortpressFlag = false;
+  bool longpressFlag = false;
+};
 
-int currentState433A;
-int lastState433A = LOW;
-unsigned long pressedTime433A  = 0;
-unsigned long releasedTime433A = 0;
-bool isPressing433A = false;
-bool isLongDetected433A = false;
-
-
-
-bool remoteshortpressFlagA = false;
-bool remotelongpressFlagA = false;
-bool remoteshortpressFlagB = false;
-bool remotelongpressFlagB = false;
-bool remoteshortpressFlagC = false;
-bool remotelongpressFlagC = false;
-bool remoteshortpressFlagD = false;
-bool remotelongpressFlagD = false;
+struct remoteModule Abutton,Bbutton,Cbutton,Dbutton;
 
 void setup() {
   // put your setup code here, to run once:
@@ -33,24 +26,18 @@ void setup() {
   pinMode(13, OUTPUT);
   flashLED(10);
 
-  
-  pinMode(remotePinA, INPUT_PULLDOWN);            //433 MHz module inputs
+  pinMode(remotePinA, INPUT_PULLDOWN);                                //433 MHz module inputs
   pinMode(remotePinB, INPUT_PULLDOWN);
   pinMode(remotePinC, INPUT_PULLDOWN);
   pinMode(remotePinD, INPUT_PULLDOWN);
-//  attachInterrupt(digitalPinToInterrupt(433A), 433interrupt, HIGH);
-//  attachInterrupt(digitalPinToInterrupt(433B), 433interrupt, HIGH);
-//  attachInterrupt(digitalPinToInterrupt(433C), 433interrupt, HIGH);
-//  attachInterrupt(digitalPinToInterrupt(433D), 433interrupt, HIGH);
-  
 }
 
 void loop() {
   // put your main code here, to run repeatedly:
 
-if (maindelay > maindelayMax)               //Main high speed loop 
+if (maindelay > maindelayMax)                                         //Main high speed loop 
 {
-  maindelay = 0;                            //resetting maindelay timer
+  maindelay = 0;                                                      //resetting maindelay timer
   checkremoteInputs();
 }
   
@@ -58,39 +45,40 @@ if (maindelay > maindelayMax)               //Main high speed loop
 
 void checkremoteInputs()
 {
-  currentState433A = digitalRead(remotePinA);
-  if(lastState433A == LOW && currentState433A == HIGH)         //button is pressed
+  Abutton.currentState = digitalRead(remotePinA);
+  if(Abutton.lastState == LOW && Abutton.currentState == HIGH)                //button is pressed
   {
-    pressedTime433A = millis();
-    isPressing433A = true;
-    isLongDetected433A = false;
+    Abutton.pressedTime = millis();
+    Abutton.isPressing = true;
+    Abutton.isLongDetected = false;
   }
-  else if(lastState433A == HIGH && currentState433A == LOW)     //button is released
+  else if(Abutton.lastState == HIGH && Abutton.currentState == LOW)           //button is released
   { 
-    isPressing433A = false;
-    releasedTime433A = millis();
-    long pressDuration433A = releasedTime433A - pressedTime433A;
-    if(pressDuration433A < SHORT_PRESS_TIME)
+    Abutton.isPressing = false;
+    Abutton.releasedTime = millis();
+    long pressDurationA = Abutton.releasedTime - Abutton.pressedTime;
+    if(pressDurationA < LONG_PRESS_MIN)
     {
-      Serial.println("A short press is detected");              //Short press detected
-      bool remoteshortpressFlagA = true;
+      Serial.println("A short press is detected");                    //Short press detected
+      Abutton.shortpressFlag = true;
       flashLED(3);
     }
   }
-  if(isPressing433A == true && isLongDetected433A == false)
+  if(Abutton.isPressing == true && Abutton.isLongDetected == false)
   {
-    long pressDuration433A = millis() - pressedTime433A;
-    if( pressDuration433A > LONG_PRESS_TIME ) 
+    long pressDurationA = millis() - Abutton.pressedTime;
+    if(pressDurationA > LONG_PRESS_MIN) 
     {
-      Serial.println("A long press is detected");               //Long press detected
+      Serial.println("A long press is detected");                     //Long press detected
       
-      isLongDetected433A = true;
-      remotelongpressFlagA = true;
-      flashLED(10);
+      Abutton.isLongDetected = true;
+      Abutton.longpressFlag = true;
+      flashLED(20);
     }
   }
 
-  lastState433A = currentState433A;
+  Abutton.lastState = Abutton.currentState;
+  
 }
 
 void flashLED(int timestoflash)
