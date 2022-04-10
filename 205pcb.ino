@@ -19,6 +19,8 @@ struct remoteModule
 
 struct remoteModule Abutton,Bbutton,Cbutton,Dbutton;
 
+remoteModule remoteButtons[] = {Abutton, Bbutton, Cbutton, Dbutton};
+
 void setup() {
   // put your setup code here, to run once:
   Serial.begin(9600);
@@ -38,46 +40,48 @@ void loop() {
 if (maindelay > maindelayMax)                                         //Main high speed loop 
 {
   maindelay = 0;                                                      //resetting maindelay timer
-  checkremoteInputs();
+  for (int i = 0; i<sizeof(remoteButtons); i++) {
+    checkremoteInput(remoteButtons[i]);
+  }
 }
   
 }
 
-void checkremoteInputs()
+void checkremoteInput(remoteModule buttonToCheck)
 {
-  Abutton.currentState = digitalRead(remotePinA);
-  if(Abutton.lastState == LOW && Abutton.currentState == HIGH)                //button is pressed
+  buttonToCheck.currentState = digitalRead(remotePinA);
+  if(buttonToCheck.lastState == LOW && buttonToCheck.currentState == HIGH)                //button is pressed
   {
-    Abutton.pressedTime = millis();
-    Abutton.isPressing = true;
-    Abutton.isLongDetected = false;
+    buttonToCheck.pressedTime = millis();
+    buttonToCheck.isPressing = true;
+    buttonToCheck.isLongDetected = false;
   }
-  else if(Abutton.lastState == HIGH && Abutton.currentState == LOW)           //button is released
+  else if(buttonToCheck.lastState == HIGH && buttonToCheck.currentState == LOW)           //button is released
   { 
-    Abutton.isPressing = false;
-    Abutton.releasedTime = millis();
-    long pressDurationA = Abutton.releasedTime - Abutton.pressedTime;
+    buttonToCheck.isPressing = false;
+    buttonToCheck.releasedTime = millis();
+    long pressDurationA = buttonToCheck.releasedTime - buttonToCheck.pressedTime;
     if(pressDurationA < LONG_PRESS_MIN)
     {
       Serial.println("A short press is detected");                    //Short press detected
-      Abutton.shortpressFlag = true;
+      buttonToCheck.shortpressFlag = true;
       flashLED(3);
     }
   }
-  if(Abutton.isPressing == true && Abutton.isLongDetected == false)
+  if(buttonToCheck.isPressing == true && buttonToCheck.isLongDetected == false)
   {
-    long pressDurationA = millis() - Abutton.pressedTime;
+    long pressDurationA = millis() - buttonToCheck.pressedTime;
     if(pressDurationA > LONG_PRESS_MIN) 
     {
       Serial.println("A long press is detected");                     //Long press detected
       
-      Abutton.isLongDetected = true;
-      Abutton.longpressFlag = true;
+      buttonToCheck.isLongDetected = true;
+      buttonToCheck.longpressFlag = true;
       flashLED(20);
     }
   }
 
-  Abutton.lastState = Abutton.currentState;
+  buttonToCheck.lastState = buttonToCheck.currentState;
   
 }
 
