@@ -3,7 +3,7 @@
 elapsedMillis maindelay;
 const unsigned int maindelayMax = 50;
 
-const int LONG_PRESS_MIN  = 1500; // 1000 milliseconds
+const int LONG_PRESS_MIN  = 1500; // 1500 milliseconds
 
 struct remoteModule
 {
