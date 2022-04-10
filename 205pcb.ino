@@ -17,7 +17,7 @@ struct remoteModule
   bool longpressFlag = false;
 };
 
-struct remoteModule Abutton,Bbutton,Cbutton,Dbutton;
+remoteModule Abutton,Bbutton,Cbutton,Dbutton;
 
 remoteModule remoteButtons[] = {Abutton, Bbutton, Cbutton, Dbutton};
 
@@ -40,8 +40,14 @@ void loop() {
 if (maindelay > maindelayMax)                                         //Main high speed loop 
 {
   maindelay = 0;                                                      //resetting maindelay timer
-  for (int i = 0; i<sizeof(remoteButtons); i++) {
+  for (int i = 0; i<sizeof(remoteButtons); i++) 
+  {
     checkremoteInput(remoteButtons[i]);
+  }
+  if (Abutton.longpressFlag == true)
+  {
+    Serial.print("Is wouter een flikert?");
+    Serial.println(Abutton.longpressFlag);
   }
 }
   
