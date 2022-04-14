@@ -15,11 +15,9 @@ struct remoteModule
   bool isLongDetected = false;
   bool shortpressFlag = false;
   bool longpressFlag = false;
-};
+} buttonNr[4];
 
-remoteModule Abutton,Bbutton,Cbutton,Dbutton;
 
-remoteModule remoteButtons[] = {Abutton, Bbutton, Cbutton, Dbutton};
 
 void setup() {
   // put your setup code here, to run once:
@@ -40,14 +38,9 @@ void loop() {
 if (maindelay > maindelayMax)                                         //Main high speed loop 
 {
   maindelay = 0;                                                      //resetting maindelay timer
-  for (int i = 0; i<sizeof(remoteButtons); i++) 
+  for (int i = 0; i<4; i++)                            //looping through all remote buttons
   {
-    checkremoteInput(remoteButtons[i]);
-  }
-  if (Abutton.longpressFlag == true)
-  {
-    Serial.print("Is wouter een flikert?");
-    Serial.println(Abutton.longpressFlag);
+    checkremoteInput(buttonNr[i]);
   }
 }
   
@@ -80,15 +73,12 @@ void checkremoteInput(remoteModule buttonToCheck)
     if(pressDurationA > LONG_PRESS_MIN) 
     {
       Serial.println("A long press is detected");                     //Long press detected
-      
       buttonToCheck.isLongDetected = true;
       buttonToCheck.longpressFlag = true;
       flashLED(20);
     }
   }
-
   buttonToCheck.lastState = buttonToCheck.currentState;
-  
 }
 
 void flashLED(int timestoflash)
