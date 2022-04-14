@@ -7,6 +7,8 @@ const int LONG_PRESS_MIN  = 1500; // 1500 milliseconds
 
 struct remoteModule
 {
+  byte id;
+  byte modulePin;
   int currentState;
   int lastState = LOW;
   unsigned long pressedTime;
@@ -15,9 +17,7 @@ struct remoteModule
   bool isLongDetected = false;
   bool shortpressFlag = false;
   bool longpressFlag = false;
-};
-
-struct remoteModule Abutton,Bbutton,Cbutton,Dbutton;
+} buttonNr[4];
 
 void setup() {
   // put your setup code here, to run once:
@@ -30,6 +30,16 @@ void setup() {
   pinMode(remotePinB, INPUT_PULLDOWN);
   pinMode(remotePinC, INPUT_PULLDOWN);
   pinMode(remotePinD, INPUT_PULLDOWN);
+  
+  buttonNr[0].modulePin = 14;
+  buttonNr[1].modulePin = 15;
+  buttonNr[2].modulePin = 16;
+  buttonNr[3].modulePin = 17;
+  
+  buttonNr[0].id = 1;
+  buttonNr[1].id = 2;
+  buttonNr[2].id = 3;
+  buttonNr[3].id = 4;
 }
 
 void loop() {
@@ -38,47 +48,49 @@ void loop() {
 if (maindelay > maindelayMax)                                         //Main high speed loop 
 {
   maindelay = 0;                                                      //resetting maindelay timer
-  checkremoteInputs();
+  for (int i = 0; i<4; i++)                            //looping through all remote buttons
+  {
+    checkremoteInput(buttonNr[i]);
+  }
 }
   
 }
 
-void checkremoteInputs()
+void checkremoteInput(remoteModule &buttonToCheck)
 {
-  Abutton.currentState = digitalRead(remotePinA);
-  if(Abutton.lastState == LOW && Abutton.currentState == HIGH)                //button is pressed
+  buttonToCheck.currentState = digitalRead(buttonToCheck.modulePin);
+  if(buttonToCheck.lastState == LOW && buttonToCheck.currentState == HIGH)                //button is pressed
   {
-    Abutton.pressedTime = millis();
-    Abutton.isPressing = true;
-    Abutton.isLongDetected = false;
+    buttonToCheck.pressedTime = millis();
+    buttonToCheck.isPressing = true;
+    buttonToCheck.isLongDetected = false;
   }
-  else if(Abutton.lastState == HIGH && Abutton.currentState == LOW)           //button is released
+  else if(buttonToCheck.lastState == HIGH && buttonToCheck.currentState == LOW)           //button is released
   { 
-    Abutton.isPressing = false;
-    Abutton.releasedTime = millis();
-    long pressDurationA = Abutton.releasedTime - Abutton.pressedTime;
+    buttonToCheck.isPressing = false;
+    buttonToCheck.releasedTime = millis();
+    long pressDurationA = buttonToCheck.releasedTime - buttonToCheck.pressedTime;
     if(pressDurationA < LONG_PRESS_MIN)
     {
-      Serial.println("A short press is detected");                    //Short press detected
-      Abutton.shortpressFlag = true;
+      Serial.print("A short press is detected on input: ");                    //Short press detected
+      Serial.println(buttonToCheck.id);
+      buttonToCheck.shortpressFlag = true;
       flashLED(3);
     }
   }
-  if(Abutton.isPressing == true && Abutton.isLongDetected == false)
+  if(buttonToCheck.isPressing == true && buttonToCheck.isLongDetected == false)
   {
-    long pressDurationA = millis() - Abutton.pressedTime;
+    long pressDurationA = millis() - buttonToCheck.pressedTime;
     if(pressDurationA > LONG_PRESS_MIN) 
     {
-      Serial.println("A long press is detected");                     //Long press detected
-      
-      Abutton.isLongDetected = true;
-      Abutton.longpressFlag = true;
+      Serial.print("A long press is detected on input: ");                     //Long press detected
+      Serial.println(buttonToCheck.id);
+      buttonToCheck.isLongDetected = true;
+      buttonToCheck.longpressFlag = true;
       flashLED(20);
     }
   }
-
-  Abutton.lastState = Abutton.currentState;
-  
+  buttonToCheck.lastState = buttonToCheck.currentState;
 }
 
 void flashLED(int timestoflash)
