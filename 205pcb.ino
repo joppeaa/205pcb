@@ -7,6 +7,8 @@ const int LONG_PRESS_MIN  = 1500; // 1000 milliseconds
 
 struct remoteModule
 {
+  byte id;
+  byte modulePin;
   int currentState;
   int lastState = LOW;
   unsigned long pressedTime;
@@ -16,8 +18,6 @@ struct remoteModule
   bool shortpressFlag = false;
   bool longpressFlag = false;
 } buttonNr[4];
-
-
 
 void setup() {
   // put your setup code here, to run once:
@@ -30,6 +30,16 @@ void setup() {
   pinMode(remotePinB, INPUT_PULLDOWN);
   pinMode(remotePinC, INPUT_PULLDOWN);
   pinMode(remotePinD, INPUT_PULLDOWN);
+  
+  buttonNr[0].modulePin = 14;
+  buttonNr[1].modulePin = 15;
+  buttonNr[2].modulePin = 16;
+  buttonNr[3].modulePin = 17;
+  
+  buttonNr[0].id = 1;
+  buttonNr[1].id = 2;
+  buttonNr[2].id = 3;
+  buttonNr[3].id = 4;
 }
 
 void loop() {
@@ -46,9 +56,9 @@ if (maindelay > maindelayMax)                                         //Main hig
   
 }
 
-void checkremoteInput(remoteModule buttonToCheck)
+void checkremoteInput(remoteModule &buttonToCheck)
 {
-  buttonToCheck.currentState = digitalRead(remotePinA);
+  buttonToCheck.currentState = digitalRead(buttonToCheck.modulePin);
   if(buttonToCheck.lastState == LOW && buttonToCheck.currentState == HIGH)                //button is pressed
   {
     buttonToCheck.pressedTime = millis();
@@ -62,7 +72,8 @@ void checkremoteInput(remoteModule buttonToCheck)
     long pressDurationA = buttonToCheck.releasedTime - buttonToCheck.pressedTime;
     if(pressDurationA < LONG_PRESS_MIN)
     {
-      Serial.println("A short press is detected");                    //Short press detected
+      Serial.print("A short press is detected on input: ");                    //Short press detected
+      Serial.println(buttonToCheck.id);
       buttonToCheck.shortpressFlag = true;
       flashLED(3);
     }
@@ -72,7 +83,8 @@ void checkremoteInput(remoteModule buttonToCheck)
     long pressDurationA = millis() - buttonToCheck.pressedTime;
     if(pressDurationA > LONG_PRESS_MIN) 
     {
-      Serial.println("A long press is detected");                     //Long press detected
+      Serial.print("A long press is detected on input: ");                     //Long press detected
+      Serial.println(buttonToCheck.id);
       buttonToCheck.isLongDetected = true;
       buttonToCheck.longpressFlag = true;
       flashLED(20);
