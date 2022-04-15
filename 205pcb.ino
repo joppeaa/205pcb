@@ -1,6 +1,9 @@
 #include "pinDeclarations.h"
 
-elapsedMillis maindelay;
+elapsedMillis mainDelay;
+elapsedMillis lockDelay;
+bool timerRunning = false;
+
 const unsigned int maindelayMax = 50;
 
 const int LONG_PRESS_MIN  = 1500; // 1500 milliseconds
@@ -30,6 +33,23 @@ void setup() {
   pinMode(remotePinB, INPUT_PULLDOWN);
   pinMode(remotePinC, INPUT_PULLDOWN);
   pinMode(remotePinD, INPUT_PULLDOWN);
+
+
+  pinMode(hornPin, OUTPUT);
+  pinMode(mirrorheatPin, OUTPUT);
+  pinMode(cabinPin, OUTPUT);
+  pinMode(indicatorPin, OUTPUT);
+  pinMode(headlightPin, OUTPUT);
+  pinMode(heaterPin, OUTPUT);
+  pinMode(servovoltagePin, OUTPUT);
+  pinMode(keyonoutputPin, OUTPUT);
+  pinMode(engineonoutputPin, OUTPUT);
+  
+  pinMode(mainrelayPin, OUTPUT);
+  pinMode(lockPin, OUTPUT);
+  pinMode(unlockPin, OUTPUT);
+  
+  writeoutputsLOW();                                                  //Writing all outputs LOW
   
   buttonNr[0].modulePin = 14;
   buttonNr[1].modulePin = 15;
@@ -42,17 +62,20 @@ void setup() {
   buttonNr[3].id = 4;
 }
 
-void loop() {
+void loop() 
+{
   // put your main code here, to run repeatedly:
 
-if (maindelay > maindelayMax)                                         //Main high speed loop 
-{
-  maindelay = 0;                                                      //resetting maindelay timer
-  for (int i = 0; i<4; i++)                            //looping through all remote buttons
+  if (mainDelay > maindelayMax)                                         //Main high speed loop 
   {
-    checkremoteInput(buttonNr[i]);
+    mainDelay = 0;                                                      //resetting maindelay timer
+    togglemainRelay();
+    for (int i = 0; i<4; i++)                            //looping through all remote buttons
+    {
+      checkremoteInput(buttonNr[i]);
+    }
+    checkforLock();
   }
-}
   
 }
 
@@ -103,4 +126,57 @@ void flashLED(int timestoflash)
     delay(30);
   }
     
+}
+
+void checkforLock()
+{
+  Serial.println("Checking for lock");
+  if (buttonNr[0].shortpressFlag == true)
+  {
+    Serial.println("Lockrequest detected");
+    lockCar();
+  }
+}
+
+void lockCar()
+{
+  const unsigned int lockdelayMax = 800;
+  if (timerRunning == false)
+  {
+    timerRunning = true;
+    lockDelay = 0;  
+  }
+  if (lockDelay < lockdelayMax)
+  {
+    digitalWrite(mirrorheatPin, HIGH);  
+    Serial.println("Locking Car");
+  }
+  else
+  {
+    digitalWrite(mirrorheatPin, LOW);  
+    buttonNr[0].shortpressFlag = false;
+    timerRunning = false;
+  }
+  
+}
+
+void togglemainRelay()
+{
+  digitalWrite(mainrelayPin, HIGH);
+}
+
+void writeoutputsLOW()
+{
+  digitalWrite(mainrelayPin, LOW);
+  digitalWrite(hornPin, LOW);
+  digitalWrite(mirrorheatPin, LOW);
+  digitalWrite(cabinPin, LOW);
+  digitalWrite(indicatorPin, LOW);
+  digitalWrite(headlightPin, LOW);
+  digitalWrite(heaterPin, LOW);
+  digitalWrite(servovoltagePin, LOW);
+  digitalWrite(lockPin, LOW);
+  digitalWrite(unlockPin, LOW);
+  digitalWrite(keyonoutputPin, LOW);
+  digitalWrite(engineonoutputPin, LOW);
 }

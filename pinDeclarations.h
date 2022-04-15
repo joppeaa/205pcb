@@ -8,8 +8,8 @@
 #define servovoltagePin 25
 #define lockPin 34
 #define unlockPin 35
-#define defrostPin 36
 
+#define defrostPin 36
 #define keyinputPin 24
 #define batteryinputPin 23
 #define auxinputPin 29
